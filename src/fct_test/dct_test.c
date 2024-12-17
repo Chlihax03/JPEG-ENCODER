@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include "../../include/dct.h"
+
+int main() {
+    // Matrice spécifique pour le test
+    uint8_t block[BLOCK_SIZE] = {
+        0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00,
+        0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00,
+        0xff, 0xff, 0x00, 0xff, 0xff, 0x00, 0xff, 0xff,
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        0x00, 0x00, 0xff, 0x00, 0x00, 0xff, 0x00, 0x00,
+        0x00, 0xff, 0x00, 0xff, 0xff, 0x00, 0xff, 0x00,
+        0xff, 0x00, 0xff, 0x00, 0x00, 0xff, 0x00, 0xff
+    };
+
+    // Affichage du bloc d'entrée
+    printf("Bloc d'entrée :\n");
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            printf("%02X ", block[i * N + j]);
+        }
+        printf("\n");
+    }
+
+    // Déclaration du bloc de fréquences
+    int16_t* frequency_block = (int16_t*)calloc(BLOCK_SIZE, sizeof(int16_t));
+
+    // Vérification de l'allocation
+    if (frequency_block == NULL) {
+        printf("Échec de l'allocation de mémoire pour linear_block.\n");
+        return EXIT_FAILURE;
+    }
+
+    // Application de la DCT sur le bloc
+    applyDCT(block, frequency_block);
+
+    // Affichage du bloc transformé
+    printf("\nRésultat attendu après DCT :\n");
+    int16_t expected_result[BLOCK_SIZE] = {
+        0x007b, 0x0000, 0xfee4, 0x0000, 0x0000, 0x0000, 0xffec, 0x0000,
+        0xfffb, 0x0000, 0xfedb, 0x0000, 0x006a, 0x0000, 0xff7e, 0x0000,
+        0xfeb3, 0x0000, 0xff8c, 0x0000, 0x0045, 0x0000, 0x0099, 0x0000,
+        0xff37, 0x0000, 0xffa1, 0x0000, 0x0018, 0x0000, 0x0003, 0x0000,
+        0x007f, 0x0000, 0x011c, 0x0000, 0x00ff, 0x0000, 0x0014, 0x0000,
+        0xffa7, 0x0000, 0x0013, 0x0000, 0x007d, 0x0000, 0xfe1f, 0x0000,
+        0xff76, 0x0000, 0x001a, 0x0000, 0xff5a, 0x0000, 0x00f4, 0x0000,
+        0x00dc, 0x0000, 0xffa9, 0x0000, 0xffba, 0x0000, 0xff3d, 0x0000
+    };
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            printf("%04X ", (uint16_t)expected_result[i * N + j]);
+        }
+        printf("\n");
+    }
+
+    // Affichage du bloc transformé par applyDCT
+    printf("\nBloc transformé avec applyDCT:\n");
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            printf("%04X ", (uint16_t)frequency_block[i * N + j]);
+        }
+        printf("\n");
+    }
+
+    // Libérer la mémoire allouée
+    free(frequency_block);
+
+    return EXIT_SUCCESS;
+}
